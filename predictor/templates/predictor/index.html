@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uji Model Sentimen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1115;
+    --surface:#161A20;
+    --surface-2:#1E232B;
+    --border:#2A2F38;
+    --text:#E8EAED;
+    --text-muted:#8B92A0;
+    --accent:#6C8EFF;
+    --accent-dim:#3D4A7A;
+    --accent-contrast:#0F1115;
+    --positif:#3FD68A;
+    --netral:#F5B942;
+    --negatif:#F26B7A;
+    --shadow: 0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+
+  html[data-theme="light"]{
+    --bg:#F5F6F8;
+    --surface:#FFFFFF;
+    --surface-2:#F0F1F4;
+    --border:#DDE1E7;
+    --text:#1B1E24;
+    --text-muted:#6B7280;
+    --accent:#3D5CDB;
+    --accent-dim:#D6DEFB;
+    --accent-contrast:#FFFFFF;
+    --positif:#1FA866;
+    --netral:#B9790A;
+    --negatif:#D9445A;
+    --shadow: 0 30px 60px -30px rgba(20,24,40,0.18);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html, body{
+    transition: background-color .2s ease, color .2s ease;
+  }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color:var(--text);
+    font-family:'Inter', system-ui, sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+  }
+
+  html[data-theme="light"] body{
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 1px);
+  }
+
+  .card{
+    width:100%;
+    max-width:560px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:36px 36px 32px;
+    box-shadow:var(--shadow);
+    position:relative;
+    transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .top-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-dim);
+  }
+
+  /* --- Theme toggle switch --- */
+  .theme-toggle{
+    flex-shrink:0;
+    width:52px;
+    height:30px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    cursor:pointer;
+    position:relative;
+    padding:0;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .theme-toggle:hover{ border-color:var(--accent); }
+  .theme-toggle .knob{
+    position:absolute;
+    top:3px;
+    left:3px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    line-height:1;
+    transition: transform .25s cubic-bezier(.4,0,.2,1), background-color .2s ease;
+  }
+  html[data-theme="light"] .theme-toggle .knob{
+    transform: translateX(22px);
+  }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:28px;
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+
+  .subtitle{
+    color:var(--text-muted);
+    font-size:14px;
+    margin:0 0 28px;
+    line-height:1.5;
+  }
+
+  form{ margin:0; }
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  .label-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .label-row label{ margin-bottom:0; }
+
+  .btn-random{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    margin:0;
+    width:fit-content;
+    color:var(--text-muted);
+    font-family:'Inter', sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0;
+    text-transform:none;
+    padding:6px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+  .btn-random:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  .btn-random:active{
+    transform:scale(0.96);
+  }
+  .btn-random .dice{
+    font-size:13px;
+    line-height:1;
+    transition:transform .35s cubic-bezier(.4,0,.2,1);
+  }
+  .btn-random.is-spinning .dice{
+    transform:rotate(180deg);
+  }
+
+  textarea{
+    width:100%;
+    min-height:120px;
+    resize:vertical;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    padding:14px 16px;
+    transition:border-color .15s ease, box-shadow .15s ease, background-color .2s ease;
+  }
+  textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-dim);
+  }
+  textarea::placeholder{ color:var(--text-muted); opacity:.7; }
+
+  button{
+    margin-top:16px;
+    width:100%;
+    background:var(--accent);
+    color:var(--accent-contrast);
+    border:none;
+    border-radius:10px;
+    padding:13px 18px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  button:hover{ filter:brightness(1.08); }
+  button:active{ transform:scale(0.98); }
+
+  .result-box{
+    margin-top:28px;
+    padding-top:24px;
+    border-top:1px dashed var(--border);
+  }
+
+  .result-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+
+  .result-label{
+    font-size:12px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  .badge{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:20px;
+    padding:4px 14px;
+    border-radius:999px;
+  }
+  .badge.positif{ color:var(--positif); background:rgba(63,214,138,0.12); }
+  .badge.netral{ color:var(--netral); background:rgba(245,185,66,0.12); }
+  .badge.negatif{ color:var(--negatif); background:rgba(242,107,122,0.12); }
+
+  html[data-theme="light"] .badge.positif{ background:rgba(31,168,102,0.12); }
+  html[data-theme="light"] .badge.netral{ background:rgba(185,121,10,0.12); }
+  html[data-theme="light"] .badge.negatif{ background:rgba(217,68,90,0.12); }
+
+  .meter-track{
+    width:100%;
+    height:8px;
+    background:var(--surface-2);
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .meter-fill{
+    height:100%;
+    border-radius:999px;
+    transition:width .4s ease;
+  }
+  .meter-fill.positif{ background:var(--positif); }
+  .meter-fill.netral{ background:var(--netral); }
+  .meter-fill.negatif{ background:var(--negatif); }
+
+  .confidence-caption{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:8px;
+  }
+
+  .error-box{
+    margin-top:28px;
+    padding:14px 16px;
+    border-radius:10px;
+    background:rgba(242,107,122,0.08);
+    border:1px solid rgba(242,107,122,0.35);
+    color:var(--negatif);
+    font-size:13.5px;
+    line-height:1.5;
+  }
+
+  .input-echo{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-bottom:12px;
+    padding:10px 12px;
+    background:var(--surface-2);
+    border-radius:8px;
+    border:1px solid var(--border);
+    word-break:break-word;
+  }
+  .input-echo:last-child{ margin-bottom:0; }
+
+  .detail-echo-box{
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px dashed var(--border);
+  }
+
+  .field-group{ margin-bottom:18px; }
+
+  select{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:border-color .15s ease, box-shadow .15s ease, background-color .2s ease;
+    appearance:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%238B92A0'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    background-size:18px;
+  }
+  select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-dim);
+  }
+
+  .model-desc{
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-top:6px;
+    line-height:1.4;
+  }
+
+  .model-summary-row{
+    margin-top:10px;
+    display:flex;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .balancing-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:999px;
+    line-height:1.4;
+    white-space:nowrap;
+  }
+  .chip-baseline{
+    color:var(--text-muted);
+    background:var(--surface);
+    border:1px solid var(--border);
+  }
+  .chip-balancing{
+    color:var(--accent);
+    background:var(--accent-dim);
+    border:1px solid transparent;
+  }
+
+  .metric-row{
+    display:flex;
+    gap:18px;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed var(--border);
+  }
+  .metric-item{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .metric-value{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .metric-label{
+    font-size:10.5px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  /* Checkbox tersembunyi sebagai state toggle "Info model".
+     Diletakkan di luar flex row supaya panel detail (lebar penuh) tidak
+     ikut terjebak/melebar di kolom flex yang sempit milik baris chip. */
+  .model-info-checkbox{
+    position:absolute;
+    opacity:0;
+    width:0;
+    height:0;
+    pointer-events:none;
+  }
+
+  .model-detail-toggle{
+    margin-left:auto;
+    flex-shrink:0;
+    font-size:11.5px;
+    color:var(--text-muted);
+    cursor:pointer;
+    user-select:none;
+    font-weight:600;
+    white-space:nowrap;
+    padding-top:2px;
+  }
+  .model-detail-toggle:hover{ color:var(--accent); }
+  .model-detail-toggle::before{
+    content:"▸ ";
+    display:inline-block;
+    transition:transform .15s ease;
+    font-size:9px;
+  }
+  .model-info-checkbox:checked ~ .model-summary-row .model-detail-toggle{
+    color:var(--accent);
+  }
+  .model-info-checkbox:checked ~ .model-summary-row .model-detail-toggle::before{
+    transform:rotate(90deg);
+  }
+
+  .detail-body{
+    display:none;
+    margin-top:10px;
+    padding:12px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    flex-direction:column;
+    gap:7px;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .model-info-checkbox:checked ~ .detail-body{
+    display:flex;
+  }
+  .detail-line{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:12px;
+  }
+  .metric-row + .detail-line{
+    margin-top:8px;
+    padding-top:12px;
+    border-top:1px dashed var(--border);
+  }
+  .detail-line span:first-child{
+    color:var(--text-muted);
+  }
+  .detail-line span:last-child{
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    text-align:right;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="top-row">
+    <div class="eyebrow">Model Tester</div>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Ganti tema terang/gelap">
+      <span class="knob" id="themeKnob">🌙</span>
+    </button>
+  </div>
+
+  <h1>Uji Sentimen Teks</h1>
+  <p class="subtitle">Masukkan satu kalimat, lalu jalankan model hasil training untuk melihat prediksi sentimennya.</p>
+
+  {% if available_models %}
+  <form method="post" id="predictForm">
+    {% csrf_token %}
+    <input type="hidden" name="action" id="formAction" value="jalankan_prediksi">
+
+    <div class="field-group">
+      <label for="model_id">Model</label>
+      <select id="model_id" name="model_id" onchange="document.getElementById('formAction').value='switch_model'; this.form.submit();">
+        {% for m in available_models %}
+          <option value="{{ m.id }}" {% if m.id == selected_model_id %}selected{% endif %}>
+            {{ m.nama_tampilan }}
+          </option>
+        {% endfor %}
+      </select>
+
+      {% for m in available_models %}
+        {% if m.id == selected_model_id %}
+        {% with has_detail=m.deskripsi|default:m.accuracy|default:m.precision_weighted %}
+
+        <input type="checkbox" id="model-info-toggle" class="model-info-checkbox">
+
+        <div class="model-summary-row">
+          <div class="balancing-row">
+            {% if m.is_baseline %}
+              <span class="chip chip-baseline">Baseline &middot; Tanpa Balancing</span>
+            {% else %}
+              {% for teknik in m.teknik_balancing %}
+                <span class="chip chip-balancing">{{ teknik }}</span>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          {% if m.deskripsi or m.accuracy or m.f1_weighted or m.precision_weighted or m.recall_weighted or m.distribusi_label %}
+          <label for="model-info-toggle" class="model-detail-toggle">Info model</label>
+          {% endif %}
+        </div>
+
+        {% if m.deskripsi or m.accuracy or m.f1_weighted or m.precision_weighted or m.recall_weighted or m.distribusi_label %}
+        <div class="detail-body">
+          {% if m.deskripsi %}
+            <div class="model-desc">{{ m.deskripsi }}</div>
+          {% endif %}
+
+          {% if m.accuracy or m.f1_weighted or m.data_total %}
+          <div class="metric-row">
+            {% if m.accuracy %}
+              <div class="metric-item">
+                <span class="metric-value">{{ m.accuracy }}%</span>
+                <span class="metric-label">Accuracy</span>
+              </div>
+            {% endif %}
+            {% if m.f1_weighted %}
+              <div class="metric-item">
+                <span class="metric-value">{{ m.f1_weighted }}%</span>
+                <span class="metric-label">F1-Score</span>
+              </div>
+            {% endif %}
+            {% if m.data_total %}
+              <div class="metric-item">
+                <span class="metric-value">{{ m.data_total }}</span>
+                <span class="metric-label">Total Data</span>
+              </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {% if m.precision_weighted or m.recall_weighted %}
+          <div class="detail-line">
+            <span>Precision (weighted)</span><span>{{ m.precision_weighted|default:"–" }}%</span>
+          </div>
+          <div class="detail-line">
+            <span>Recall (weighted)</span><span>{{ m.recall_weighted|default:"–" }}%</span>
+          </div>
+          {% endif %}
+          {% if m.data_train or m.data_test %}
+          <div class="detail-line">
+            <span>Data Training / Testing</span><span>{{ m.data_train|default:"–" }} / {{ m.data_test|default:"–" }}</span>
+          </div>
+          {% endif %}
+          {% if m.distribusi_label %}
+          <div class="detail-line">
+            <span>Distribusi Label</span>
+            <span>
+              {% for label, jumlah in m.distribusi_label.items %}{{ label|capfirst }}: {{ jumlah }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% endwith %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="label-row">
+      <label for="text_input">Teks</label>
+      {% if contoh_tweet_list %}
+      <button type="button" class="btn-random" id="btnRandomTweet">
+        <span class="dice">🎲</span> Acak Teks
+      </button>
+      {% endif %}
+    </div>
+    <textarea id="text_input" name="text_input" placeholder="Contoh: Pelayanannya cepat dan ramah sekali, saya senang sekali memesan disini">{{ text_input|default:"" }}</textarea>
+    <button type="submit">Jalankan Prediksi</button>
+
+    {% if result %}
+      <div class="result-box">
+        <div class="result-row">
+          <span class="result-label">Hasil Prediksi</span>
+          <span class="badge {{ result|lower }}">{{ result }}</span>
+        </div>
+        {% if confidence %}
+          <div class="meter-track">
+            <div class="meter-fill {{ result|lower }}" style="width: {{ confidence }}%;"></div>
+          </div>
+          <div class="confidence-caption">Confidence: {{ confidence }}%</div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </form>
+  {% if contoh_tweet_list %}
+    {{ contoh_tweet_list|json_script:"contoh-tweet-data" }}
+  {% endif %}
+  {% endif %}
+
+  {% if error %}
+    <div class="error-box">{{ error }}</div>
+  {% endif %}
+
+  {% if result %}
+    {% if text_input or teks_bersih %}
+    <div class="detail-echo-box">
+      {% if text_input %}
+        <div class="input-echo">&gt; {{ text_input }}</div>
+      {% endif %}
+      {% if teks_bersih %}
+        <div class="input-echo" style="opacity:0.7;">Teks Bersih&gt; {{ teks_bersih }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<script>
+  (function () {
+    // Pola tema seperti claude.ai:
+    // - Default "ikuti sistem": selalu sinkron dengan device, real-time, tanpa perlu reload.
+    // - Begitu user klik toggle, pilihan terkunci manual dan tersimpan (localStorage),
+    //   device berubah ATAU halaman reload (mis. submit form) tidak akan menimpa lagi.
+    const STORAGE_KEY = 'sentimen-theme'; // nilai: 'light' | 'dark' | null (null = ikut sistem)
+    const root = document.documentElement;
+    const toggleBtn = document.getElementById('themeToggle');
+    const knob = document.getElementById('themeKnob');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+
+    function getStoredTheme() {
+      try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+    }
+
+    function setStoredTheme(theme) {
+      try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* ignore */ }
+    }
+
+    function systemTheme() {
+      return mediaQuery.matches ? 'light' : 'dark';
+    }
+
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      knob.textContent = theme === 'light' ? '☀️' : '🌙';
+    }
+
+    function render() {
+      const manual = getStoredTheme();
+      applyTheme(manual || systemTheme());
+    }
+
+    // Render pertama kali (termasuk setelah reload akibat submit form)
+    render();
+
+    // Kalau device berganti tema (mis. dark mode otomatis malam hari) DAN
+    // user belum pernah memilih manual, ikut berubah secara real-time.
+    mediaQuery.addEventListener('change', function () {
+      if (!getStoredTheme()) {
+        render();
+      }
+    });
+
+    // Klik toggle = kunci pilihan manual, tersimpan, tidak lagi ikut device
+    // ATAU tidak lagi reset saat halaman reload (submit form, dll).
+    toggleBtn.addEventListener('click', function () {
+      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const next = current === 'light' ? 'dark' : 'light';
+      setStoredTheme(next);
+      applyTheme(next);
+    });
+  })();
+
+  // --- Tombol "Acak Contoh": isi textarea dengan satu teks acak dari
+  //     daftar contoh tweet (dikirim dari Django lewat json_script,
+  //     supaya aman dari XSS dan tidak perlu request tambahan ke server). ---
+  (function () {
+    const dataEl = document.getElementById('contoh-tweet-data');
+    const btn = document.getElementById('btnRandomTweet');
+    const textarea = document.getElementById('text_input');
+    if (!dataEl || !btn || !textarea) return;
+
+    let daftarTweet = [];
+    try {
+      daftarTweet = JSON.parse(dataEl.textContent) || [];
+    } catch (e) {
+      daftarTweet = [];
+    }
+    if (!daftarTweet.length) return;
+
+    let lastIndex = -1;
+
+    btn.addEventListener('click', function () {
+      // Hindari contoh yang sama persis dua kali berturut-turut kalau ada >1 pilihan.
+      let idx = Math.floor(Math.random() * daftarTweet.length);
+      if (daftarTweet.length > 1 && idx === lastIndex) {
+        idx = (idx + 1) % daftarTweet.length;
+      }
+      lastIndex = idx;
+
+      textarea.value = daftarTweet[idx];
+      textarea.focus();
+
+      // Animasi kecil pada ikon dadu sebagai feedback klik.
+      btn.classList.add('is-spinning');
+      setTimeout(function () { btn.classList.remove('is-spinning'); }, 350);
+    });
+  })();
+</script>
+
+</body>
+</html>

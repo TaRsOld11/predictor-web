@@ -1,0 +1,21 @@
+{
+  "nama_tampilan": "SVM + TF-IDF (Hybrid Resampling)",
+  "deskripsi": "Menggunakan teknik balancing data dengan upsampling kelas minoritas dan downsampling kelas mayoritas.",
+  "teknik_balancing": [
+    "Random Upsampling + Downsampling"
+  ],
+  "accuracy": 0.7225,
+  "precision_weighted": 0.7408,
+  "recall_weighted": 0.7225,
+  "f1_weighted": 0.7224,
+  "data_info": {
+    "total": 3483,
+    "train": 2244,
+    "test": 1045,
+    "distribusi_label": {
+      "positif": 748,
+      "negatif": 748,
+      "netral": 748
+    }
+  }
+}

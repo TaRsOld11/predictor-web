@@ -1,0 +1,19 @@
+{
+  "nama_tampilan": "SVM + TF-IDF",
+  "deskripsi": "Tidak menggunakan teknik balancing data apapun.",
+  "teknik_balancing": [],
+  "accuracy": 0.7541,
+  "precision_weighted": 0.7467,
+  "recall_weighted": 0.7541,
+  "f1_weighted": 0.7485,
+  "data_info": {
+    "total": 3483,
+    "train": 2438,
+    "test": 1045,
+    "distribusi_label": {
+      "netral": 2087,
+      "negatif": 1069,
+      "positif": 327
+    }
+  }
+}

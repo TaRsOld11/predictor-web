@@ -1,0 +1,21 @@
+{
+  "nama_tampilan": "SVM + TF-IDF (SMOTE)",
+  "deskripsi": "Menggunakan teknik balancing data bernama SMOTE yang melakukan upsampling pada kelas minoritas.",
+  "teknik_balancing": [
+    "SMOTE"
+  ],
+  "accuracy": 0.7301,
+  "precision_weighted": 0.7307,
+  "recall_weighted": 0.7301,
+  "f1_weighted": 0.7301,
+  "data_info": {
+    "total": 3483,
+    "train": 4383,
+    "test": 1045,
+    "distribusi_label": {
+      "netral": 1461,
+      "negatif": 1461,
+      "positif": 1461
+    }
+  }
+}

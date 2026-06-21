@@ -30,7 +30,7 @@ sentiment_django/
         │   ├── stopwords.json
         │   └── config.json
         └── model_lainnya/
-        └── ... (struktur sama)
+            └── ... (struktur sama)
 ```
 
 Detail file pada model:

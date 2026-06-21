@@ -23,14 +23,14 @@ sentiment_django/
     │   └── predictor/
     │       └── index.html     ← tampilan halaman
     └── ml_model/
-	├── svm_baseline/
-	│   ├── pipeline_sentimen.pkl
-	│   ├── label_encoder.pkl
-	│   ├── kamus_normalisasi.json
-	│   ├── stopwords.json
-	│   └── config.json
-	└── model_lainnya/
-    	└── ... (struktur sama)
+        ├── svm_baseline/
+        │   ├── pipeline_sentimen.pkl
+        │   ├── label_encoder.pkl
+        │   ├── kamus_normalisasi.json
+        │   ├── stopwords.json
+        │   └── config.json
+        └── model_lainnya/
+        └── ... (struktur sama)
 ```
 
 Detail file pada model:

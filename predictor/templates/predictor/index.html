@@ -3,7 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/72x72/1f4ca.png">
 <title>Uji Model Sentimen</title>
+
+<script>
+  // Fix blinking saat reload di tema terang
+  (function () {
+    try {
+      var stored = localStorage.getItem('sentimen-theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) { /* localStorage tidak tersedia, biarkan default gelap */ }
+  })();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -104,7 +117,6 @@
     box-shadow:0 0 0 4px var(--accent-dim);
   }
 
-  /* --- Theme toggle switch --- */
   .theme-toggle{
     flex-shrink:0;
     width:52px;
@@ -428,9 +440,6 @@
     letter-spacing:0.04em;
   }
 
-  /* Checkbox tersembunyi sebagai state toggle "Info model".
-     Diletakkan di luar flex row supaya panel detail (lebar penuh) tidak
-     ikut terjebak/melebar di kolom flex yang sempit milik baris chip. */
   .model-info-checkbox{
     position:absolute;
     opacity:0;
@@ -438,7 +447,6 @@
     height:0;
     pointer-events:none;
   }
-
   .model-detail-toggle{
     margin-left:auto;
     flex-shrink:0;
@@ -659,10 +667,9 @@
 
 <script>
   (function () {
-    // Pola tema seperti claude.ai:
-    // - Default "ikuti sistem": selalu sinkron dengan device, real-time, tanpa perlu reload.
-    // - Begitu user klik toggle, pilihan terkunci manual dan tersimpan (localStorage),
-    //   device berubah ATAU halaman reload (mis. submit form) tidak akan menimpa lagi.
+    // Pola tema:
+    // - Default "ikuti sistem"
+    // - Begitu user klik toggle, pilihan terkunci manual dan tersimpan (localStorage)
     const STORAGE_KEY = 'sentimen-theme'; // nilai: 'light' | 'dark' | null (null = ikut sistem)
     const root = document.documentElement;
     const toggleBtn = document.getElementById('themeToggle');
@@ -686,24 +693,22 @@
       knob.textContent = theme === 'light' ? '☀️' : '🌙';
     }
 
-    function render() {
+    function syncKnob() {
       const manual = getStoredTheme();
       applyTheme(manual || systemTheme());
     }
 
-    // Render pertama kali (termasuk setelah reload akibat submit form)
-    render();
+    // Sinkronkan ikon knob dengan atribut yang sudah di-set oleh script <head>.
+    syncKnob();
 
-    // Kalau device berganti tema (mis. dark mode otomatis malam hari) DAN
-    // user belum pernah memilih manual, ikut berubah secara real-time.
+    // Kalau device berganti tema dan tidal ada di localstorage, tema berubah secara real-time.
     mediaQuery.addEventListener('change', function () {
       if (!getStoredTheme()) {
-        render();
+        syncKnob();
       }
     });
 
-    // Klik toggle = kunci pilihan manual, tersimpan, tidak lagi ikut device
-    // ATAU tidak lagi reset saat halaman reload (submit form, dll).
+    // Klik toggle = pilih tema dan tersimpan
     toggleBtn.addEventListener('click', function () {
       const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
       const next = current === 'light' ? 'dark' : 'light';
@@ -712,9 +717,7 @@
     });
   })();
 
-  // --- Tombol "Acak Contoh": isi textarea dengan satu teks acak dari
-  //     daftar contoh tweet (dikirim dari Django lewat json_script,
-  //     supaya aman dari XSS dan tidak perlu request tambahan ke server). ---
+  // --- Tombol "Acak Teks": mengisi input dengan teks acak dari contoh data
   (function () {
     const dataEl = document.getElementById('contoh-tweet-data');
     const btn = document.getElementById('btnRandomTweet');

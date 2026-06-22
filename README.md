@@ -1,6 +1,6 @@
 # Sentiment Django — Uji Model Sentimen (TF-IDF + SVM)
 
-Web 1 halaman berbasis **Django** untuk menguji model sentimen Bahasa Indonesia
+Website berbasis **Django** untuk menguji model sentimen Bahasa Indonesia
 hasil training (TF-IDF + SVM, dilabeli otomatis dengan IndoBERTweet di notebook training).
 
 ---
@@ -39,9 +39,9 @@ Detail file pada model:
 |---|---|
 | `pipeline_sentimen.pkl` | sklearn Pipeline (TF-IDF + classifier), sudah di-fit |
 | `label_encoder.pkl` | LabelEncoder untuk decode hasil prediksi |
-| `kamus_normalisasi.json` | kamus normalisasi slang/alay (harus identik dgn training model ini) |
-| `stopwords.json` | daftar stopword (harus identik dgn training model ini) |
-| `config.json` | `{"nama_tampilan": "...", "deskripsi": "..."}` — teks yang muncul di dropdown |
+| `kamus_normalisasi.json` | kamus normalisasi slang/alay |
+| `stopwords.json` | daftar stopword |
+| `config.json` | `{"nama_tampilan": "...", "deskripsi": "..."}` |
 
 ---
 

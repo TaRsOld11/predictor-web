@@ -117,6 +117,7 @@
     box-shadow:0 0 0 4px var(--accent-dim);
   }
 
+  /* --- Theme toggle switch --- */
   .theme-toggle{
     flex-shrink:0;
     width:52px;
@@ -147,6 +148,12 @@
   }
   html[data-theme="light"] .theme-toggle .knob{
     transform: translateX(22px);
+  }
+  .theme-toggle .knob::before{
+    content:"🌙";
+  }
+  html[data-theme="light"] .theme-toggle .knob::before{
+    content:"☀️";
   }
 
   h1{
@@ -514,7 +521,7 @@
   <div class="top-row">
     <div class="eyebrow">Model Tester</div>
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Ganti tema terang/gelap">
-      <span class="knob" id="themeKnob">🌙</span>
+      <span class="knob"></span>
     </button>
   </div>
 
@@ -673,7 +680,6 @@
     const STORAGE_KEY = 'sentimen-theme'; // nilai: 'light' | 'dark' | null (null = ikut sistem)
     const root = document.documentElement;
     const toggleBtn = document.getElementById('themeToggle');
-    const knob = document.getElementById('themeKnob');
     const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
 
     function getStoredTheme() {
@@ -690,21 +696,12 @@
 
     function applyTheme(theme) {
       root.setAttribute('data-theme', theme);
-      knob.textContent = theme === 'light' ? '☀️' : '🌙';
     }
 
-    function syncKnob() {
-      const manual = getStoredTheme();
-      applyTheme(manual || systemTheme());
-    }
-
-    // Sinkronkan ikon knob dengan atribut yang sudah di-set oleh script <head>.
-    syncKnob();
-
-    // Kalau device berganti tema dan tidal ada di localstorage, tema berubah secara real-time.
+    // Kalau device berganti tema dan tidak di localstorage, tema berubah secara real-time.
     mediaQuery.addEventListener('change', function () {
       if (!getStoredTheme()) {
-        syncKnob();
+        applyTheme(systemTheme());
       }
     });
 
